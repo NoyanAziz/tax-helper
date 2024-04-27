@@ -1,2 +1,8 @@
 # virtalenv
 /tax-helper-env
+
+#python
+__pycache__
+
+#.env file
+.env
