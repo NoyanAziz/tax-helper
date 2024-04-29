@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import axios from "axios";
+import Cookies from "universal-cookie";
 
 import { useRouter } from "next/navigation";
 
@@ -23,6 +24,7 @@ import {
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
 
+  const cookies = new Cookies();
   const router = useRouter();
 
   const handleSubmit = async (event) => {
@@ -38,7 +40,9 @@ export default function Login() {
         password: password,
       })
       .then((response) => {
-        router.push("/dashboard/");
+        cookies.set("token", response.data.access, { path: "/" });
+
+        router.push("/dashboard");
         router.refresh();
       })
       .catch((error) => {
