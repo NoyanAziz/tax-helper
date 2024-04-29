@@ -6,3 +6,11 @@ class ChatsConfig(AppConfig):
 
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'chats'
+
+    def ready(self):
+        """
+            Import expenses signals.
+
+            :return:
+            """
+        import chats.signals  # pylint: disable=unused-import, import-outside-toplevel

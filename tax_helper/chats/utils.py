@@ -22,7 +22,7 @@ def perform_ocr(attachment):
     :param attachment:
     :return:
     """
-    if attachment.name.lower().endswith('.pdf'):
+    if attachment.lower().endswith('.pdf'):
         images = convert_from_path(attachment)
 
         text = ''
