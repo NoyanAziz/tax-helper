@@ -1,17 +1,20 @@
-import Image from "next/image";
-import styles from "./page.module.css";
-import { Box } from "@mui/material";
-import { ChatHistory } from "./components";
+"use client";
+
+import React, { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function Home() {
-  return (
-    <Box sx={{ 
-      minHeight: '100vh',
-      justifyContent: 'center',
-      alignItems: 'center',
-      display: 'flex',
-    }}>
-      <ChatHistory />
-    </Box>
-  );
+  const auth = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (auth) {
+      router.push("/dashboard/");
+    } else {
+      router.push("/login/");
+    }
+  }, [auth, router]);
+
+  return null;
 }
