@@ -20,6 +20,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import ROUTES from "../constants/routes";
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
@@ -35,7 +36,7 @@ export default function Login() {
     const password = formData.get("password");
 
     axios
-      .post("http://localhost:8000/users/login/", {
+      .post(ROUTES.LOGIN, {
         email: email,
         password: password,
       })

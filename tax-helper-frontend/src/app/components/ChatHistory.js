@@ -20,6 +20,7 @@ import axios from "axios";
 import Cookies from "universal-cookie";
 import { SENDER_USER, USER_ROLE } from "../constants/misc";
 import { LABELS } from "../constants/displayMessages";
+import ROUTES from "../constants/routes";
 
 export default function ChatHistory() {
   const cookies = new Cookies();
@@ -34,7 +35,7 @@ export default function ChatHistory() {
 
   const getPrompts = () => {
     axios
-      .get("http://localhost:8000/chats/prompts/", {
+      .get(ROUTES.GET_PROMPTS, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -84,7 +85,7 @@ export default function ChatHistory() {
       setMessage("");
 
       axios
-        .post("http://localhost:8000/chats/send-prompt/", formData, {
+        .post(ROUTES.SEND_PROMPT, formData, {
           headers: {
             "Content-Type": "multipart/form-data",
             Authorization: `Bearer ${token}`,
@@ -118,7 +119,7 @@ export default function ChatHistory() {
       setMessage("");
 
       axios
-        .post("http://localhost:8000/chats/send-prompt/", formData, {
+        .post(ROUTES.SEND_PROMPT, formData, {
           headers: {
             "Content-Type": "multipart/form-data",
             Authorization: `Bearer ${token}`,
