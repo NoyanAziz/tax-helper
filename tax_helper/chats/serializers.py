@@ -15,11 +15,14 @@ class MessageAttachmentSerializer(serializers.ModelSerializer):
 class MessagePromptSerializer(serializers.ModelSerializer):
     """MessagePromptSerializer class."""
 
-    attachment = serializers.FileField(source='message_attachment.attachment')
-    user = serializers.CharField(source='user.full_name')
+    attachment = serializers.FileField(
+        source='message_attachment.attachment', required=False)
+    person_name = serializers.CharField(
+        source='user.full_name', required=False)
 
     class Meta:
         """Meta class of MessagePromptSerializer."""
 
         model = MessagePrompt
-        fields = ('id', 'message', 'user', 'attachment')
+        fields = ('id', 'message', 'user', 'role', 'attachment', 'person_name')
+        read_only_fields = ('id',)

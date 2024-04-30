@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 
-import { AttachFile, Send } from "@mui/icons-material";
+import { AttachFile, PictureAsPdf, Send } from "@mui/icons-material";
 import {
   Box,
   Card,
@@ -11,9 +11,10 @@ import {
   IconButton,
   InputAdornment,
   OutlinedInput,
+  TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
-import Image from "next/image";
 import axios from "axios";
 import Cookies from "universal-cookie";
 
@@ -21,6 +22,57 @@ export default function ChatHistory() {
   const cookies = new Cookies();
   const token = cookies.get("token");
   const [prompts, setPrompts] = useState([]);
+
+  const [message, setMessage] = useState("");
+  const [file, setFile] = useState(null);
+
+  const handleFileChange = (event) => {
+    const selectedFile = event.target.files[0];
+    setFile(selectedFile);
+    setMessage(selectedFile.name);
+  };
+
+  const sendPromptOrFile = async () => {
+    if (!file) {
+      const formData = new FormData();
+      formData.append("message", message);
+
+      axios
+        .post("http://localhost:8000/chats/send-prompt/", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then((response) => {
+          const newPrompts = prompts;
+          newPrompts.push({ message: response.data });
+          setPrompts(newPrompts);
+        })
+        .catch((error) => {
+          console.error("Error uploading file:", error);
+        });
+    } else {
+      const formData = new FormData();
+      formData.append("attachment", file);
+
+      axios
+        .post("http://localhost:8000/chats/send-prompt/", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then((response) => {
+          const newPrompts = prompts;
+          newPrompts.push({ message: response.data });
+          setPrompts(newPrompts);
+        })
+        .catch((error) => {
+          console.error("Error uploading file:", error);
+        });
+    }
+  };
 
   const getPrompts = () => {
     axios
@@ -51,8 +103,10 @@ export default function ChatHistory() {
     >
       <Card
         sx={{
-          width: "100vh",
           height: "90vh",
+          width: "100vh",
+          display: "flex",
+          flexDirection: "column",
           color: "primary",
           borderRadius: 5,
         }}
@@ -65,16 +119,27 @@ export default function ChatHistory() {
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
-              m: 5,
             }}
           >
             <Typography variant="h5">Tax Helper Chat</Typography>
           </Grid>
-          <Grid item xs={12} sx={{ width: 600, height: 600, overflow: "auto" }}>
+          <Grid
+            item
+            xs={12}
+            sx={{
+              width: 600,
+              height: "60%",
+              overflow: "auto",
+              background: "dimgray",
+              ml: 5,
+              mr: 5,
+              borderRadius: 5,
+            }}
+          >
             {prompts.map((prompt, index) => (
               <Box key={index} sx={{ ml: 5, mr: 5, mt: 4 }}>
                 <Typography sx={{ m: 1 }} variant="body1">
-                  {prompt.user}
+                  {prompt.person_name}
                 </Typography>
                 <Grid
                   item
@@ -86,9 +151,21 @@ export default function ChatHistory() {
                   }}
                 >
                   {prompt.attachment ? (
-                    <Box key={prompt.id} sx={{ mt: 2 }}>
-                      <Typography variant="h6">{prompt.name}</Typography>
-                      <Image src={prompt.attachment} alt="Attachment Preview" />
+                    <Box sx={{ mt: 2 }}>
+                      <Tooltip title={prompt.attachment}>
+                        <TextField
+                          disabled
+                          value={prompt.attachment}
+                          alt="Attachment Preview"
+                          InputProps={{
+                            startAdornment: (
+                              <InputAdornment position="start">
+                                <PictureAsPdf />
+                              </InputAdornment>
+                            ),
+                          }}
+                        />
+                      </Tooltip>
                     </Box>
                   ) : (
                     <Typography variant="body1">{prompt.message}</Typography>
@@ -104,16 +181,31 @@ export default function ChatHistory() {
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
-              m: 5,
+              ml: 5,
+              mr: 5,
             }}
           >
             <FormControl fullWidth variant="outlined">
               <OutlinedInput
                 id="password"
-                sx={{ height: 80, borderRadius: 5 }}
+                sx={{
+                  height: 80,
+                  borderRadius: 5,
+                }}
+                value={message}
+                onChange={() => setMessage(event.target.value)}
                 startAdornment={
                   <InputAdornment position="start">
-                    <AttachFile />
+                    <label htmlFor="fileInput">
+                      <AttachFile />
+                    </label>
+                    <input
+                      id="fileInput"
+                      type="file"
+                      style={{ display: "none" }}
+                      hidden={file === null}
+                      onChange={handleFileChange}
+                    />
                   </InputAdornment>
                 }
                 endAdornment={
@@ -121,6 +213,7 @@ export default function ChatHistory() {
                     <IconButton
                       aria-label="toggle password visibility"
                       edge="end"
+                      onClick={sendPromptOrFile}
                     >
                       <Send />
                     </IconButton>

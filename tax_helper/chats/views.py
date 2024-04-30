@@ -1,35 +1,17 @@
 import os
-from groq import Groq
+
 from django.http import StreamingHttpResponse
-from rest_framework.generics import CreateAPIView
+from groq import Groq
+from rest_framework import status
+from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAuthenticated
 
-from .models import MessageAttachment, MessagePrompt
+from .tasks import add_system_prompt
+from .constants import USER
+from .models import MessagePrompt
 from .serializers import MessageAttachmentSerializer, MessagePromptSerializer
-
-
-class UploadAttachmentView(CreateAPIView):
-    """UploadAttachmentView class."""
-
-    serializer_class = MessageAttachmentSerializer
-    permission_classes = (IsAuthenticated,)
-    queryset = MessageAttachment.objects.all()
-
-    def create(self, request, *args, **kwargs):
-        """
-        Create a new message attachment.
-
-        :param request:
-        :param args:
-        :param kwargs:
-        :return:
-        """
-        request.data['uploaded_by'] = request.user.id
-        request.data['name'] = request.FILES['attachment'].name
-
-        return super().create(request, *args, **kwargs)
 
 
 def stream_response(response):
@@ -45,39 +27,62 @@ class MessagePromptView(APIView):
         """
         Get all message prompts.
         """
-        requester = request.user
-        request_data = {
-            **request.data,
-            "user": request.user.id
-        }
+        requester_id = request.user.id
 
-        serializer = MessagePromptSerializer(data=request_data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save(user=request.user)
+        attachment = request.FILES.get('attachment')
+        if attachment:
+            request_data = {
+                'attachment': attachment,
+                'uploaded_by': requester_id,
+                'name': attachment.name
+            }
 
-        old_messages = MessagePrompt.objects.filter(user=requester)
-        message_prompts = [
-            {
+            serializer = MessageAttachmentSerializer(data=request_data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+
+            return Response(status=status.HTTP_201_CREATED)
+        else:
+            request_data = {
+                'message': request.POST.get('message'),
+                'user': requester_id,
+                'role': USER
+            }
+
+            serializer = MessagePromptSerializer(data=request_data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            old_messages = MessagePrompt.objects.filter(user_id=requester_id)
+            message_prompts = [{
                 "role": "system",
                 "content": "You are a tax helper, you will answer questions related to taxes."
-            },
-        ] + [
-            {"role": "user", "content": message.message}
-            for message in old_messages
-        ]
+            }] + [
+                {
+                    "role": "user" if message.role == USER else "system",
+                    "content": message.message
+                }
+                for message in old_messages
+            ]
 
-        client = Groq(api_key=os.environ.get("GROQ_API_KEY"),)
-        stream = client.chat.completions.create(
-            messages=message_prompts,
-            model="mixtral-8x7b-32768",
-            temperature=0.5,
-            max_tokens=1024,
-            top_p=1,
-            stop=None,
-            stream=True,
-        )
+            client = Groq(api_key=os.environ.get("GROQ_API_KEY"),)
+            stream = client.chat.completions.create(
+                messages=message_prompts,
+                model="llama3-8b-8192",
+                temperature=0.5,
+                max_tokens=1024,
+                top_p=1,
+                stop=None,
+                stream=False,
+            )
+            response_data = stream.choices[0].message.content
 
-        return StreamingHttpResponse(stream_response(stream))
+            # response = StreamingHttpResponse(
+            #     response_data, status=200, content_type='text/event-stream')
+            # response['Cache-Control'] = 'no-cache',
+            # return response
+        add_system_prompt.delay(response_data, requester_id)
+
+        return Response(response_data)
 
 
 class MessagePromptListView(ListAPIView):

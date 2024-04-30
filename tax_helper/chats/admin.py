@@ -6,7 +6,7 @@ from .models import MessageAttachment, MessagePrompt
 class MessageAttachmentAdmin(admin.ModelAdmin):
     """MessageAttachmentAdmin class."""
 
-    list_display = ('name', 'message', 'created_at')
+    list_display = ('name', 'created_at')
     list_filter = ('created_at',)
     search_fields = ('name',)
 
