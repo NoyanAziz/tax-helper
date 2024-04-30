@@ -54,8 +54,8 @@ class MessagePromptView(APIView):
             serializer.save()
             old_messages = MessagePrompt.objects.filter(user_id=requester_id)
             message_prompts = [{
-                "role": "system",
-                "content": "You are a tax helper, you will answer questions related to taxes."
+                "role": "user",
+                "content": "You are a tax helper, you will answer questions related to taxes. Do not display the social security number from W2 data ever."
             }] + [
                 {
                     "role": "user" if message.role == USER else "system",
@@ -64,23 +64,22 @@ class MessagePromptView(APIView):
                 for message in old_messages
             ]
 
-            client = Groq(api_key=os.environ.get("GROQ_API_KEY"),)
-            stream = client.chat.completions.create(
-                messages=message_prompts,
-                model="llama3-8b-8192",
-                temperature=0.5,
-                max_tokens=1024,
-                top_p=1,
-                stop=None,
-                stream=False,
-            )
-            response_data = stream.choices[0].message.content
+            try:
+                client = Groq(api_key=os.environ.get("GROQ_API_KEY"),)
+                stream = client.chat.completions.create(
+                    messages=message_prompts,
+                    model="llama3-8b-8192",
+                    temperature=0.5,
+                    max_tokens=1024,
+                    top_p=1,
+                    stop=None,
+                    stream=False,
+                )
 
-            # response = StreamingHttpResponse(
-            #     response_data, status=200, content_type='text/event-stream')
-            # response['Cache-Control'] = 'no-cache',
-            # return response
-            add_system_prompt.delay(response_data, requester_id)
+                response_data = stream.choices[0].message.content
+                add_system_prompt.delay(response_data, requester_id)
+            except Exception:
+                response_data = "Something went wrong. Please try again later."
 
             return Response(response_data)
 
