@@ -1,17 +1,34 @@
+"use client";
+
 import React from "react";
-import { Box } from "@mui/material";
+import { AppBar, Box, IconButton, Toolbar, Typography } from "@mui/material";
 import { ChatHistory } from "../components";
+import { LABELS } from "../constants/displayMessages";
+import { Logout } from "@mui/icons-material";
+import Cookies from "universal-cookie";
+import { useRouter } from "next/navigation";
 
 export default function Dashboard() {
+  const cookies = new Cookies();
+  const router = useRouter();
+
   return (
-    <Box
-      sx={{
-        minHeight: "100vh",
-        justifyContent: "center",
-        alignItems: "center",
-        display: "flex",
-      }}
-    >
+    <Box sx={{ flexGrow: 1 }}>
+      <AppBar position="static">
+        <Toolbar>
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+            {LABELS.DASHBOARD_TITLE}
+          </Typography>
+          <IconButton
+            onClick={() => {
+              cookies.remove("token");
+              router.push("/login");
+            }}
+          >
+            <Logout />
+          </IconButton>
+        </Toolbar>
+      </AppBar>
       <ChatHistory />
     </Box>
   );

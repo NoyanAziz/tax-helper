@@ -136,15 +136,7 @@ export default function ChatHistory() {
   };
 
   return (
-    <Box
-      sx={{
-        minHeight: "100vh",
-        minWidth: "100vh",
-        justifyContent: "center",
-        alignItems: "center",
-        display: "flex",
-      }}
-    >
+    <div style={{ display: "flex", justifyContent: "center" }}>
       <Card
         sx={{
           height: "90vh",
@@ -165,7 +157,7 @@ export default function ChatHistory() {
               alignItems: "center",
             }}
           >
-            <Typography variant="h5">{LABELS.DASHBOARD_TITLE}</Typography>
+            <Typography variant="h5">{LABELS.CHAT}</Typography>
           </Grid>
           <Grid
             item
@@ -276,6 +268,6 @@ export default function ChatHistory() {
           </Grid>
         </Grid>
       </Card>
-    </Box>
+    </div>
   );
 }
