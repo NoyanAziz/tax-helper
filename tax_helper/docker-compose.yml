@@ -1,0 +1,57 @@
+version: "3.10"
+
+services:
+  # Django Service
+  django:
+    build: .
+    container_name: django
+    command: >
+      bash -c "python manage.py makemigrations &&
+               python manage.py migrate &&
+               python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/usr/src/app/
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=1
+      - DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]
+      - CELERY_BROKER=redis://redis:6379/0
+      - CELERY_BACKEND=redis://redis:6379/0
+    depends_on:
+      - pgdb
+      - redis
+
+  # Celery Service
+  celery:
+    build: .
+    command: celery -A tax_helper worker -l INFO
+    volumes:
+      - .:/usr/src/app
+    environment:
+      - DEBUG=1
+      - DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]
+      - CELERY_BROKER=redis://redis:6379/0
+      - CELERY_BACKEND=redis://redis:6379/0
+    depends_on:
+      - django
+      - redis
+
+  # PostgreSQL Database Service
+  pgdb:
+    image: postgres:14
+    container_name: pgdb
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data/
+
+  # Redis Service
+  redis:
+    image: "redis:alpine"
+
+# Define a named volume for PostgreSQL data storage
+volumes:
+  pgdata:
