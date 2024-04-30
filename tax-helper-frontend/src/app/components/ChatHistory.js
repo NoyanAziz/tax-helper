@@ -18,12 +18,7 @@ import {
 } from "@mui/material";
 import axios from "axios";
 import Cookies from "universal-cookie";
-import {
-  SENDER_SYSTEM,
-  SENDER_USER,
-  SYSTEM_ROLE,
-  USER_ROLE,
-} from "../constants/misc";
+import { SENDER_USER, USER_ROLE } from "../constants/misc";
 import { LABELS } from "../constants/displayMessages";
 
 export default function ChatHistory() {
