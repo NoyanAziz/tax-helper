@@ -1,4 +1,6 @@
 from rest_framework import serializers
+
+from .constants import USER
 from .models import MessageAttachment, MessagePrompt
 
 
@@ -17,12 +19,20 @@ class MessagePromptSerializer(serializers.ModelSerializer):
 
     attachment = serializers.FileField(
         source='message_attachment.attachment', required=False)
-    person_name = serializers.CharField(
-        source='user.full_name', required=False)
+    sender = serializers.SerializerMethodField()
 
     class Meta:
         """Meta class of MessagePromptSerializer."""
 
         model = MessagePrompt
-        fields = ('id', 'message', 'user', 'role', 'attachment', 'person_name')
+        fields = ('id', 'message', 'user', 'role', 'attachment', 'sender')
         read_only_fields = ('id',)
+
+    def get_sender(self, instance):
+        """
+        Get sender.
+
+        :param instance:
+        :return:
+        """
+        return "You" if instance.role == USER else 'Tax Helper'

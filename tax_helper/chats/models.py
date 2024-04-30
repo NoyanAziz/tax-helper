@@ -1,7 +1,6 @@
 from django.db import models
 
 from .constants import PROMPT_ROLE_CHOICES
-
 from .utils import attachment_uploading_path
 
 
@@ -21,7 +20,8 @@ class CustomTimeStampModel(models.Model):
 class MessagePrompt(CustomTimeStampModel):
     """MessagePrompt model."""
 
-    user = models.ForeignKey('users.User', on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        'users.User', related_name='message_prompts', on_delete=models.CASCADE)
     role = models.IntegerField(choices=PROMPT_ROLE_CHOICES)
     message = models.TextField()
 

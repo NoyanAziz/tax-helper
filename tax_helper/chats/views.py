@@ -80,9 +80,9 @@ class MessagePromptView(APIView):
             #     response_data, status=200, content_type='text/event-stream')
             # response['Cache-Control'] = 'no-cache',
             # return response
-        add_system_prompt.delay(response_data, requester_id)
+            add_system_prompt.delay(response_data, requester_id)
 
-        return Response(response_data)
+            return Response(response_data)
 
 
 class MessagePromptListView(ListAPIView):
