@@ -45,7 +45,7 @@ class MessageAttachment(CustomTimeStampModel):
     uploaded_by = models.ForeignKey(
         'users.User', null=True, blank=True, on_delete=models.CASCADE)
     message = models.OneToOneField(
-        'MessagePrompt', null=True, blank=True, on_delete=models.CASCADE)
+        'MessagePrompt', null=True, blank=True, related_name='message_attachment', on_delete=models.CASCADE)
 
     name = models.CharField(max_length=200, blank=True, null=True)
     attachment = models.FileField(upload_to=attachment_uploading_path)

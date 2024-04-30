@@ -1,4 +1,6 @@
-import React from "react";
+"use client";
+
+import React, { useEffect, useState } from "react";
 
 import { AttachFile, Send } from "@mui/icons-material";
 import {
@@ -11,8 +13,32 @@ import {
   OutlinedInput,
   Typography,
 } from "@mui/material";
+import Image from "next/image";
+import axios from "axios";
+import Cookies from "universal-cookie";
 
-export default function Login() {
+export default function ChatHistory() {
+  const cookies = new Cookies();
+  const token = cookies.get("token");
+  const [prompts, setPrompts] = useState([]);
+
+  const getPrompts = () => {
+    axios
+      .get("http://localhost:8000/chats/prompts/", {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((response) => {
+        setPrompts(response.data);
+      });
+  };
+
+  useEffect(() => {
+    getPrompts();
+  }, []);
+
   return (
     <Box
       sx={{
@@ -45,11 +71,11 @@ export default function Login() {
             <Typography variant="h5">Tax Helper Chat</Typography>
           </Grid>
           <Grid item xs={12} sx={{ width: 600, height: 600, overflow: "auto" }}>
-            {[1, 2, 3, 4].map((value, index) => (
+            {prompts.map((prompt, index) => (
               <Box key={index} sx={{ ml: 5, mr: 5, mt: 4 }}>
-                <Typography sx={{ m: 1 }} variant="body1">{`User ${
-                  (value % 2) + 1
-                }`}</Typography>
+                <Typography sx={{ m: 1 }} variant="body1">
+                  {prompt.user}
+                </Typography>
                 <Grid
                   item
                   xs={12}
@@ -59,13 +85,14 @@ export default function Login() {
                     borderRadius: 2,
                   }}
                 >
-                  <Typography variant="body1">
-                    Can you let me know what I just did? Can you let me know
-                    what I just did?
-                    {/* Can you let me know what I just did? Can you let me know what I just did?
-                                        Can you let me know what I just did?Can you let me know what I just did?
-                                        Can you let me know what I just did? */}
-                  </Typography>
+                  {prompt.attachment ? (
+                    <Box key={prompt.id} sx={{ mt: 2 }}>
+                      <Typography variant="h6">{prompt.name}</Typography>
+                      <Image src={prompt.attachment} alt="Attachment Preview" />
+                    </Box>
+                  ) : (
+                    <Typography variant="body1">{prompt.message}</Typography>
+                  )}
                 </Grid>
               </Box>
             ))}
