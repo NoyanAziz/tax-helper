@@ -64,22 +64,19 @@ class MessagePromptView(APIView):
                 for message in old_messages
             ]
 
-            try:
-                client = Groq(api_key=os.environ.get("GROQ_API_KEY"),)
-                stream = client.chat.completions.create(
-                    messages=message_prompts,
-                    model="llama3-8b-8192",
-                    temperature=0.5,
-                    max_tokens=1024,
-                    top_p=1,
-                    stop=None,
-                    stream=False,
-                )
+            client = Groq(api_key=os.environ.get("GROQ_API_KEY"),)
+            stream = client.chat.completions.create(
+                messages=message_prompts,
+                model="llama3-8b-8192",
+                temperature=0.5,
+                max_tokens=1024,
+                top_p=1,
+                stop=None,
+                stream=False,
+            )
 
-                response_data = stream.choices[0].message.content
-                add_system_prompt.delay(response_data, requester_id)
-            except Exception:
-                response_data = "Something went wrong. Please try again later."
+            response_data = stream.choices[0].message.content
+            add_system_prompt.delay(response_data, requester_id)
 
             return Response(response_data)
 
