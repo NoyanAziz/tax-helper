@@ -52,7 +52,8 @@ class MessagePromptView(APIView):
             serializer = MessagePromptSerializer(data=request_data)
             serializer.is_valid(raise_exception=True)
             serializer.save()
-            old_messages = MessagePrompt.objects.filter(user_id=requester_id)
+            old_messages = MessagePrompt.objects.filter(
+                user_id=requester_id).order_by('created_at')
             message_prompts = [{
                 "role": "user",
                 "content": "You are a tax helper, you will answer questions related to taxes. Do not display the social security number from W2 data ever."
@@ -64,19 +65,22 @@ class MessagePromptView(APIView):
                 for message in old_messages
             ]
 
-            client = Groq(api_key=os.environ.get("GROQ_API_KEY"),)
-            stream = client.chat.completions.create(
-                messages=message_prompts,
-                model="llama3-8b-8192",
-                temperature=0.5,
-                max_tokens=1024,
-                top_p=1,
-                stop=None,
-                stream=False,
-            )
+            try:
+                client = Groq(api_key=os.environ.get("GROQ_API_KEY"),)
+                stream = client.chat.completions.create(
+                    messages=message_prompts,
+                    model="llama3-8b-8192",
+                    temperature=0.5,
+                    max_tokens=1024,
+                    top_p=1,
+                    stop=None,
+                    stream=False,
+                )
 
-            response_data = stream.choices[0].message.content
-            add_system_prompt.delay(response_data, requester_id)
+                response_data = stream.choices[0].message.content
+                add_system_prompt.delay(response_data, requester_id)
+            except Exception:
+                response_data = "An error occurred. Please try again later."
 
             return Response(response_data)
 
@@ -93,4 +97,4 @@ class MessagePromptListView(ListAPIView):
 
         :return:
         """
-        return MessagePrompt.objects.filter(user=self.request.user)
+        return MessagePrompt.objects.filter(user=self.request.user).order_by('created_at')
