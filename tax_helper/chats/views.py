@@ -69,7 +69,7 @@ class MessagePromptView(APIView):
                 client = Groq(api_key=os.environ.get("GROQ_API_KEY"),)
                 stream = client.chat.completions.create(
                     messages=message_prompts,
-                    model="llama3-8b-8192",
+                    model="gemma-7b-it",
                     temperature=0.5,
                     max_tokens=1024,
                     top_p=1,
