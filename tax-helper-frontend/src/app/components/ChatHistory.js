@@ -157,7 +157,9 @@ export default function ChatHistory() {
               alignItems: "center",
             }}
           >
-            <Typography variant="h5">{LABELS.CHAT}</Typography>
+            <Typography color="paleturquoise" variant="h5">
+              {LABELS.CHAT}
+            </Typography>
           </Grid>
           <Grid
             item
@@ -166,7 +168,7 @@ export default function ChatHistory() {
               width: 600,
               height: "60%",
               overflow: "auto",
-              background: "dimgray",
+              background: "darkslategray",
               ml: 5,
               mr: 5,
               borderRadius: 5,
@@ -258,7 +260,7 @@ export default function ChatHistory() {
                         disabled={loading}
                         onClick={sendPromptOrFile}
                       >
-                        <Send />
+                        <Send style={{ color: "paleturquoise" }} />
                       </IconButton>
                     </InputAdornment>
                   }

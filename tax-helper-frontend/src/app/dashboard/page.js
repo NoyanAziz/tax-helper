@@ -16,7 +16,12 @@ export default function Dashboard() {
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
         <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+          <Typography
+            color="paleturquoise"
+            variant="h6"
+            component="div"
+            sx={{ flexGrow: 1 }}
+          >
             {LABELS.DASHBOARD_TITLE}
           </Typography>
           <IconButton
@@ -25,7 +30,7 @@ export default function Dashboard() {
               router.push("/login");
             }}
           >
-            <Logout />
+            <Logout style={{ color: "indianred" }} />
           </IconButton>
         </Toolbar>
       </AppBar>
