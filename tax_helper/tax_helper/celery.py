@@ -6,7 +6,7 @@ if BROKER_HOST is None:
     raise Exception("BROKER_HOST environmental variable is not defined")
 
 broker_url = 'pyamqp://guest@' + BROKER_HOST + '//'
-app = Celery('task_helper', broker=broker_url, backend='rpc://')
+app = Celery('tax_helper', broker=broker_url, backend='rpc://')
 
 
 app.config_from_object('django.conf:settings', namespace='CELERY')
