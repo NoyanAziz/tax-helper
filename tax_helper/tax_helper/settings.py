@@ -130,10 +130,10 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 # set the celery broker url
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_BROKER_URL = 'redis://redis.dramatic-chickadee.koyeb:6379/0'
 
 # set the celery result backend
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://redis.dramatic-chickadee.koyeb:6379/0'
 
 # set the celery timezone
 CELERY_TIMEZONE = 'UTC'
