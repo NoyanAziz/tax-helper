@@ -11,7 +11,7 @@ broker_url = 'pyamqp://guest@' + BROKER_HOST + '//'
 app = Celery('tax_helper', broker=broker_url, backend='rpc://')
 
 
-app.config_from_object('django.conf:settings', namespace='CELERY')
+# app.config_from_object('django.conf:settings', namespace='CELERY')
 
 app.autodiscover_tasks()
 
