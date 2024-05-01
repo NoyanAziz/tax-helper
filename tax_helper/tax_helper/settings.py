@@ -33,7 +33,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 DEBUG = os.getenv('DEBUG')
 
 ALLOWED_HOSTS = ["127.0.0.1", ".vercel.app", ".now.sh",
-                 "localhost", 'https://tax-helper-backend-noyan-aziz.koyeb.app']
+                 "localhost", 'tax-helper-backend-noyan-aziz.koyeb.app']
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000', 'https://tax-helper-frontend-93mylhns6-noyanazizs-projects.vercel.app',
