@@ -16,23 +16,23 @@ def create_users(apps, schema_editor):
     users = [
         _User(
             first_name='Admin', last_name='User', email='admin@example.com', password=make_password('Admin1234'),
-            is_staff=True,
+            is_staff=True, is_superuser=True
         ),
         _User(
             first_name='Tax', last_name='User', email='tax.user@example.com', password=make_password('Admin1234'),
-            is_staff=True,
+            is_staff=True, is_superuser=True
         ),
         _User(
             first_name='Kashif', last_name='Ali', email='kashif.ali@example.com', password=make_password('Admin1234'),
-            is_staff=True,
+            is_staff=True, is_superuser=True
         ),
         _User(
             first_name='Asif', last_name='Ali', email='asif.ali@example.com', password=make_password('Admin1234'),
-            is_staff=True,
+            is_staff=True, is_superuser=True
         ),
         _User(
             first_name='Nawaz', last_name='Shah', email='nawaz.shah@example.com', password=make_password('Admin1234'),
-            is_staff=True,
+            is_staff=True, is_superuser=True
         ),
     ]
 
