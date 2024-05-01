@@ -37,7 +37,7 @@ ALLOWED_HOSTS = ["127.0.0.1", ".vercel.app", ".now.sh",
                  "localhost", 'tax-helper-backend-noyan-aziz.koyeb.app']
 
 CORS_ALLOWED_ORIGINS = [
-    'http://localhost:3000', 'https://tax-helper-frontend-93mylhns6-noyanazizs-projects.vercel.app',
+    'http://localhost:3000', 'https://tax-helper-frontend.vercel.app',
 ]
 
 AUTH_USER_MODEL = 'users.User'
