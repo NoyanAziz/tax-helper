@@ -62,7 +62,7 @@ export default function ChatHistory() {
     if (scrollRef.current) {
       scrollRef.current.scrollIntoView({ behaviour: "smooth" });
     }
-  }, [prompts]);
+  }, [prompts, loading]);
 
   const handleFileChange = (event) => {
     const selectedFile = event.target.files[0];
